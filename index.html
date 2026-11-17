@@ -84,7 +84,7 @@
     content:""; position:absolute; top:-1px; left:50%; transform:translateX(-50%);
     border:5px solid transparent; border-top:6px solid #2ee6a8;
   }
-  main { flex:1; overflow-y:auto; padding:12px 16px 10px; -webkit-overflow-scrolling:touch; }
+  main { flex:1; overflow-y:auto; padding:12px 16px 26px; -webkit-overflow-scrolling:touch; }
   main > div { animation:viewin .38s cubic-bezier(.3,.9,.3,1); }
   @keyframes viewin { from { opacity:0; transform:translateY(9px);} to { opacity:1; transform:none;} }
   .panelTitle { font-size:11px; letter-spacing:2.6px; color:#8fb8a2; text-transform:uppercase; margin:4px 0 12px; font-weight:600; }
@@ -183,6 +183,12 @@
   }
   #sheetCard { border-radius:22px; padding:13px 15px 6px; }
   #sheetCard #backBtn { padding-top:0; }
+  #bandTicks { background:repeating-linear-gradient(90deg, rgba(46,230,168,.13) 0 1px, transparent 1px 14px); }
+  #bandReadout {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:7px;
+    font-size:9.5px; letter-spacing:1.8px; color:#8fb8a2; white-space:nowrap;
+  }
+  #bandReadout b { color:#2ee6a8; font-size:11.5px; letter-spacing:1px; }
   .tick .tn { display:none; }
   .tick.on .tn { display:block; }
   .cityCard .car { color:#2ee6a8; font-size:15px; font-weight:800; margin-left:10px; }
@@ -761,6 +767,7 @@ let rot = 15, tilt = 16, zoom = 1;
 let targetRot = null, targetTilt = null;
 let dragging = false, lastInteract = 0, vel = 0;
 const pointers = new Map(); let pinchD = 0;
+let tapMark = -1, tapX = 0, tapY = 0;
 
 function proj(lat, lon){
   const la = lat * Math.PI / 180, lo = (lon + rot) * Math.PI / 180, ti = tilt * Math.PI / 180;
@@ -770,24 +777,22 @@ function proj(lat, lon){
 const markerBtns = CITIES.map((c, i) => {
   const b = document.createElement('button');
   b.className = 'marker'; b.type = 'button';
-  b.innerHTML = '<span class="dot"></span><span class="lbl">' + c.name.toUpperCase() + '</span>';
+  const dot = document.createElement('span'); dot.className = 'dot';
+  const lbl = document.createElement('span'); lbl.className = 'lbl'; lbl.textContent = c.name.toUpperCase();
+  b.append(dot, lbl); b._lbl = lbl; b.dataset.cityIdx = i;
   b.addEventListener('click', () => selectCity(i, true));
   markersEl.appendChild(b);
   return b;
 });
 const ticksEl = document.getElementById('bandTicks');
 const needle = document.getElementById('needle');
-CITIES.forEach((c, i) => {
-  const t = document.createElement('button');
-  t.className = 'tick'; t.type = 'button';
-  t.style.left = (4 + (92 * i) / (CITIES.length - 1)) + '%';
-  t.innerHTML = '<b>' + c.freq + '</b><span class="tn">' + c.name.split(' ')[0].toUpperCase() + '</span>';
-  t.addEventListener('click', () => selectCity(i, true));
-  ticksEl.appendChild(t);
-});
+const bandReadout = document.createElement('div');
+bandReadout.id = 'bandReadout';
+bandReadout.textContent = 'TAP A CITY TO TUNE IN';
+ticksEl.appendChild(bandReadout);
 function setNeedle(i){
   needle.style.left = (4 + (92 * i) / (CITIES.length - 1)) + '%';
-  [...ticksEl.children].forEach((t, j) => t.classList.toggle('on', j === i));
+  bandReadout.innerHTML = '<b>' + CITIES[i].freq + '</b>' + CITIES[i].name.toUpperCase();
 }
 function drawGlobe(){
   if (!W) fitCanvas();
@@ -817,6 +822,7 @@ function drawGlobe(){
       b.style.left = (cxp + p.x * R) + 'px';
       b.style.top = (cyp - p.y * R) + 'px';
       b.style.opacity = Math.min(1, (p.z - 0.1) * 3);
+      b._lbl.style.display = p.z > 0.55 ? 'block' : 'none';
     } else b.style.display = 'none';
   });
 }
@@ -834,6 +840,9 @@ function tick(){
   requestAnimationFrame(tick);
 }
 stage.addEventListener('pointerdown', e => {
+  const mk = e.target && e.target.closest ? e.target.closest('.marker') : null;
+  tapMark = mk ? +mk.dataset.cityIdx : -1;
+  tapX = e.clientX; tapY = e.clientY;
   pointers.set(e.pointerId, [e.clientX, e.clientY]);
   stage.setPointerCapture(e.pointerId);
   dragging = true; vel = 0; targetRot = null; lastInteract = performance.now();
@@ -856,7 +865,15 @@ stage.addEventListener('pointermove', e => {
 });
 function endPointer(e){
   pointers.delete(e.pointerId);
-  if (!pointers.size){ dragging = false; lastInteract = performance.now(); }
+  if (!pointers.size){
+    dragging = false; lastInteract = performance.now();
+    if (tapMark >= 0 && Math.hypot(e.clientX - tapX, e.clientY - tapY) < 10){
+      const idx = tapMark; tapMark = -1;
+      selectCity(idx, true);
+      return;
+    }
+    tapMark = -1;
+  }
 }
 stage.addEventListener('pointerup', endPointer);
 stage.addEventListener('pointercancel', endPointer);
