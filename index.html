@@ -874,7 +874,7 @@ stage.addEventListener('pointermove', e => {
     tilt = Math.max(-45, Math.min(55, tilt + dy * 0.2));
   } else if (pointers.size === 2){
     const p = [...pointers.values()], d = Math.hypot(p[0][0]-p[1][0], p[0][1]-p[1][1]);
-    if (pinchD) zoom = Math.max(0.7, Math.min(1.9, zoom * d / pinchD));
+    if (pinchD) zoom = Math.max(0.7, Math.min(3.2, zoom * d / pinchD));
     pinchD = d;
   }
 });
@@ -894,7 +894,7 @@ stage.addEventListener('pointerup', endPointer);
 stage.addEventListener('pointercancel', endPointer);
 stage.addEventListener('wheel', e => {
   e.preventDefault();
-  zoom = Math.max(0.7, Math.min(1.9, zoom * (e.deltaY < 0 ? 1.09 : 0.92)));
+  zoom = Math.max(0.7, Math.min(3.2, zoom * (e.deltaY < 0 ? 1.09 : 0.92)));
   lastInteract = performance.now();
 }, { passive:false });
 document.addEventListener('gesturestart', e => e.preventDefault());
