@@ -46,7 +46,7 @@
   }
   #searchInput::placeholder { color:#648a76; }
   #searchNote { font-size:11px; color:#8fb8a2; margin:7px 2px 0; min-height:14px; }
-  #stage { position:relative; flex:0 0 42%; min-height:245px; touch-action:none; }
+  #stage { position:relative; flex:1 1 auto; min-height:0; touch-action:none; }
   #globe { position:absolute; inset:0; width:100%; height:100%; touch-action:none; display:block; }
   #markers { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
   .marker {
@@ -162,13 +162,61 @@
   #vol { width:70px; accent-color:#2ee6a8; }
   #status { font-size:11.5px; color:#8fd8b8; margin-top:9px; min-height:15px; }
   #status.err { color:#ff9d8a; }
+
+  /* Two-tab layout: Globe (stage + station sheet) and Stations (country list). */
+  #tabs { display:flex; gap:8px; padding:2px 18px 10px; }
+  .tabbtn {
+    flex:1; padding:11px 0; border-radius:14px; cursor:pointer; font-size:13.5px; font-weight:700; letter-spacing:1.6px;
+    background:rgba(12,34,24,.55); border:1px solid rgba(46,230,168,.3); color:#b7d9c7;
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); text-transform:uppercase;
+  }
+  .tabbtn.on { background:#2ee6a8; color:#032117; border-color:#2ee6a8; }
+  #globeTab { flex:1; display:flex; flex-direction:column; position:relative; min-height:0; }
+  #globeHint {
+    position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:3; pointer-events:none;
+    font-size:10.5px; letter-spacing:1.8px; color:#b7d9c7; white-space:nowrap;
+    background:rgba(3,13,9,.6); border:1px solid rgba(46,230,168,.22); border-radius:999px; padding:6px 13px;
+  }
+  #sheet {
+    position:absolute; left:0; right:0; bottom:0; z-index:6; max-height:64%;
+    overflow-y:auto; padding:8px 12px 12px; -webkit-overflow-scrolling:touch;
+  }
+  #sheetCard { border-radius:22px; padding:13px 15px 6px; }
+  #sheetCard #backBtn { padding-top:0; }
+  .tick .tn { display:none; }
+  .tick.on .tn { display:block; }
+  .cityCard .car { color:#2ee6a8; font-size:15px; font-weight:800; margin-left:10px; }
+  .stSub { padding:2px 0 4px; }
+  .subchips { display:flex; gap:7px; flex-wrap:wrap; margin:2px 0 10px; }
+  .tile.g-Pop { background:linear-gradient(140deg, #8a2b5c, #e065a8); }
+  .tile.g-Salsa { background:linear-gradient(140deg, #8a4b0f, #e08a2e); }
+  .tile.g-Afrobeat { background:linear-gradient(140deg, #7a4a08, #d9a441); }
+  .tile.g-Arabic { background:linear-gradient(140deg, #0b5c46, #2ec98a); }
+  .tile.g-Talk { background:linear-gradient(140deg, #3a4450, #8fa3b8); }
+  .tile.g-Blues { background:linear-gradient(140deg, #12294d, #3f7fd1); }
+  .tile.g-Country { background:linear-gradient(140deg, #6e4a12, #c98a2e); }
+  .tile.g-Americana { background:linear-gradient(140deg, #5c3a10, #b87b32); }
+  .tile.g-Folk { background:linear-gradient(140deg, #2e4d1e, #6fa843); }
+  .tile.g-Gospel { background:linear-gradient(140deg, #4d2e6e, #9a6ae0); }
+  .tile.g-Metal { background:linear-gradient(140deg, #1a1a22, #5c5c78); }
+  .tile.g-Punk { background:linear-gradient(140deg, #6e1030, #e03a6e); }
+  .tile.g-ClassicRock { background:linear-gradient(140deg, #4d3410, #c98a3a); }
+  .tile.g-Soul { background:linear-gradient(140deg, #5c1e3a, #c94f7c); }
+  .tile.g-K-Pop { background:linear-gradient(140deg, #7a2b86, #e065d0); }
+  .tile.g-Soca { background:linear-gradient(140deg, #8a6a0f, #e0c22e); }
+  .tile.g-Cumbia { background:linear-gradient(140deg, #7a5c08, #d1a92e); }
+  .tile.g-Dub { background:linear-gradient(140deg, #0f3d2e, #2e8a5c); }
+  .tile.g-FilmScores { background:linear-gradient(140deg, #2e2a5c, #6a62c9); }
+  .tile.g-GameMusic { background:linear-gradient(140deg, #103a5c, #2e9ad1); }
+  .tile.g-Ambient { background:linear-gradient(140deg, #233a4d, #5c8ab8); }
   /* Desktop layer: min-width only, so phone rendering is untouched. The globe
      stage keeps the full viewport width; the header, panel and player bar are
      centered in a capped column and the lists flow into multi-column grids. */
   @media (min-width: 900px) {
-    header, #searchBar, main, #playerWrap {
+    header, #searchBar, #tabs, main, #playerWrap {
       width:100%; max-width:980px; margin-left:auto; margin-right:auto;
     }
+    #sheet { width:100%; max-width:980px; left:50%; transform:translateX(-50%); }
     main { padding:18px 24px 14px; }
     #luckyBtn { display:block; max-width:520px; margin-left:auto; margin-right:auto; }
     #cityList, #favBlock, #stationList, #searchResults {
@@ -176,9 +224,11 @@
     }
     #cityList .region, #favBlock .region { grid-column:1 / -1; }
     #cityList .cityCard, #favBlock .stRow, #stationList .stRow, #searchResults .stRow { margin-bottom:0; }
+    #cityList .stSub { grid-column:1 / -1; }
   }
   @media (min-width: 1280px) {
-    header, #searchBar, main, #playerWrap { max-width:1180px; }
+    header, #searchBar, #tabs, main, #playerWrap { max-width:1180px; }
+    #sheet { max-width:1180px; }
     #cityList, #favBlock, #stationList, #searchResults {
       grid-template-columns:repeat(3, minmax(0, 1fr));
     }
@@ -194,23 +244,32 @@
   <input id="searchInput" type="search" placeholder="Search any station or city in the world" autocomplete="off">
   <div id="searchNote">Searches a live worldwide directory of stations.</div>
 </div>
-<section id="stage">
-  <canvas id="globe"></canvas>
-  <div id="markers"></div>
-  <div id="band"><div id="bandTicks"></div><div id="needle"></div></div>
-</section>
+<nav id="tabs">
+  <button id="tabGlobeBtn" class="tabbtn on" type="button">Globe</button>
+  <button id="tabListBtn" class="tabbtn" type="button">Stations</button>
+</nav>
+<div id="globeTab">
+  <section id="stage">
+    <canvas id="globe"></canvas>
+    <div id="markers"></div>
+    <div id="globeHint">DRAG TO SPIN · TAP A CITY</div>
+    <div id="band"><div id="bandTicks"></div><div id="needle"></div></div>
+  </section>
+  <div id="sheet" hidden>
+    <div id="sheetCard" class="glass">
+      <button id="backBtn">&#8592; Close</button>
+      <div id="cityHead"></div>
+      <div id="chips"></div>
+      <div id="stationList"></div>
+    </div>
+  </div>
+</div>
 <main id="panel">
   <div id="homeView">
     <button id="luckyBtn">Take me somewhere</button>
-    <div class="panelTitle">Tap a city on the globe, or pick one</div>
+    <div class="panelTitle">Every country on the dial · tap one to open its stations</div>
     <div id="favBlock"></div>
     <div id="cityList"></div>
-  </div>
-  <div id="cityView" hidden>
-    <button id="backBtn">&#8592; All cities</button>
-    <div id="cityHead"></div>
-    <div id="chips"></div>
-    <div id="stationList"></div>
   </div>
   <div id="searchView" hidden>
     <button id="backBtn2">&#8592; Back</button>
@@ -359,7 +418,7 @@ const CITIES = [
 ];
 CITIES.forEach(c => c.stations.forEach(s => { s.city = c.name; s.key = c.name + "|" + s.name; }));
 const ALL_STATIONS = CITIES.flatMap(c => c.stations);
-const REGION_ORDER = ["UK","Europe","North America","Latin America & Caribbean","Africa","Asia-Pacific"];
+const REGION_ORDER = ["UK","Europe","North America","Latin America & Caribbean","Africa","Middle East","Asia-Pacific"];
 
 /* ---- dance expansion: merged in before the globe builds its markers ---- */
 function addStation(cityName, st){
@@ -484,6 +543,206 @@ addStation("Kingston", { name:"Fame 95 FM", genre:"Reggae", urls:["https://strea
 CITIES.forEach(c => c.stations.forEach(s => { s.city = c.name; if (!s.key) s.key = c.name + "|" + s.name; }));
 ALL_STATIONS.push(...CITIES.flatMap(c => c.stations.filter(s => !ALL_STATIONS.includes(s))));
 
+/* ---- world hunt expansion: George's picks, Nov 16 2026 ----
+   Every stream below passed both checks on Nov 16, 2026: a direct
+   request and a request carrying this app's Referer header. */
+CITIES.push(
+ { name:"Lagos", country:"Nigeria", region:"Africa", lat:6.5244, lon:3.3792, freq:"95.1", stations:[
+   { name:"Wazobia FM 95.1", genre:"Afrobeat", urls:["https://wazobiafmlagos951-atunwadigital.streamguys1.com/wazobiafmlagos951"] },
+   { name:"Nigeria Info 99.3", genre:"Talk", urls:["https://nigeriainfofmlagos993-atunwadigital.streamguys1.com/nigeriainfofmlagos993"] }
+ ]},
+ { name:"Nairobi", country:"Kenya", region:"Africa", lat:-1.2921, lon:36.8219, freq:"105.2", stations:[
+   { name:"Classic 105", genre:"Pop", urls:["https://classic105-atunwadigital.streamguys1.com/classic105"] },
+   { name:"Kameme FM", genre:"World", urls:["https://kamemefm-atunwadigital.streamguys1.com/kamemefm"] },
+   { name:"Nation FM", genre:"Modern", urls:["https://stream.radiojar.com/3by7s8eg65quv"] }
+ ]},
+ { name:"Cape Town", country:"South Africa", region:"Africa", lat:-33.9249, lon:18.4241, freq:"94.5", stations:[
+   { name:"KFM 94.5", genre:"Pop", urls:["https://playerservices.streamtheworld.com/api/livestream-redirect/KFM.mp3"] },
+   { name:"Fine Music Radio", genre:"Classical", hls:true, urls:["https://edge.iono.fm/xhls/fmr_live_high.m3u8"] }
+ ]},
+ { name:"Cairo", country:"Egypt", region:"Africa", lat:30.0444, lon:31.2357, freq:"100.6", stations:[
+   { name:"Nogoum FM", genre:"Arabic", urls:["https://stream-159.zeno.fm/qb1zvsykm98uv"] },
+   { name:"Radio Hits 88.2", genre:"Arabic", urls:["https://radiohits882.radioca.st/;"] },
+   { name:"Radio 9090", genre:"Arabic", urls:["https://9090streaming.mobtada.com/9090FMEGYPT"] }
+ ]},
+ { name:"Rabat", country:"Morocco", region:"Africa", lat:33.9716, lon:-6.8498, freq:"99.5", stations:[
+   { name:"Hit Radio", genre:"Pop", urls:["https://hitradio-maroc.ice.infomaniak.ch/hitradio-maroc-128.mp3"] }
+ ]},
+ { name:"Casablanca", country:"Morocco", region:"Africa", lat:33.5731, lon:-7.5898, freq:"98.5", stations:[
+   { name:"Chada FM", genre:"Arabic", hls:true, urls:["https://stream.bodkas.com/playlist?id=chadafmradio"] },
+   { name:"Skyrock Casablanca", genre:"Hip Hop", urls:["https://icecast.skyrock.net/s/casa_aac_64k"] }
+ ]},
+ { name:"Dakar", country:"Senegal", region:"Africa", lat:14.7167, lon:-17.4677, freq:"103.1", stations:[
+   { name:"FM Sénégal 103.1", genre:"World", urls:["https://stream-154.zeno.fm/t8gcyq6ts0quv"] },
+   { name:"Radio Fulbe FM", genre:"World", urls:["https://stream.zeno.fm/e0grbn8e3rquv"] }
+ ]},
+ { name:"Addis Ababa", country:"Ethiopia", region:"Africa", lat:8.9806, lon:38.7578, freq:"102.1", stations:[
+   { name:"Sheger FM 102.1", genre:"World", urls:["https://stream.zeno.fm/y91n1vtbaw5tv"] },
+   { name:"Ethio FM 107.8", genre:"World", urls:["https://stream.zeno.fm/72y045deqeruv"] }
+ ]},
+ { name:"Istanbul", country:"Turkey", region:"Europe", lat:41.0082, lon:28.9784, freq:"99.5", stations:[
+   { name:"KRAL FM", genre:"World", hls:true, urls:["https://dygedge2.radyotvonline.net/kralfm/playlist.m3u8"] },
+   { name:"Açık Radyo", genre:"World", urls:["http://stream.34bit.net/ar.mp3"] },
+   { name:"İstanbul FM", genre:"World", hls:true, urls:["https://yayin.istanbulfm.com.tr/istanbulfm/playlist.m3u8"] }
+ ]},
+ { name:"Dubai", country:"United Arab Emirates", region:"Middle East", lat:25.2048, lon:55.2708, freq:"100.9", stations:[
+   { name:"Al Khaleejiya 100.9", genre:"Arabic", urls:["https://stream.radiojar.com/5wpf9e4erxquv"] },
+   { name:"TAG 91.1", genre:"Pop", urls:["https://stream-159.zeno.fm/7neg6f1hbm0uv"] },
+   { name:"LUV 107.1", genre:"World", urls:["https://funasia.streamguys1.com/live2"] },
+   { name:"Al Arabiya 99", genre:"Arabic", urls:["https://stream.radiojar.com/s1mygd1frxquv"] }
+ ]},
+ { name:"Beirut", country:"Lebanon", region:"Middle East", lat:33.8938, lon:35.5018, freq:"96.7", stations:[
+   { name:"Sawt El Ghad", genre:"Arabic", urls:["https://l3.itworkscdn.net/itwaudio/9030/stream/"] },
+   { name:"Light FM 90.5", genre:"Pop", urls:["http://29333.live.streamtheworld.com:3690/LIGHTFMAAC_SC"] },
+   { name:"Radio Liban Libre", genre:"Arabic", urls:["https://edge.mixlr.com/channel/qtqeb"] }
+ ]},
+ { name:"Tel Aviv", country:"Israel", region:"Middle East", lat:32.0853, lon:34.7818, freq:"91.8", stations:[
+   { name:"Galgalatz", genre:"Pop", urls:["https://glzicylv01.bynetcdn.com/glglz_mp3"] },
+   { name:"Radio Tel Aviv 102FM", genre:"Pop", urls:["http://102.livecdn.biz/102fm_aac"] }
+ ]},
+ { name:"Seoul", country:"South Korea", region:"Asia-Pacific", lat:37.5665, lon:126.978, freq:"101.3", stations:[
+   { name:"Arirang Radio", genre:"K-Pop", hls:true, urls:["http://amdlive-ch03-ctnd-com.akamaized.net/arirang_3ch/arirang_3ch_audio/chunklist_b128000.m3u8"] },
+   { name:"TBS eFM 101.3", genre:"Modern", hls:true, urls:["https://cdnefm.tbs.seoul.kr/tbs/_definst_/tbs_efm_web_360.smil/chunklist.m3u8"] },
+   { name:"Big B Radio", genre:"K-Pop", urls:["https://antares.dribbcast.com/proxy/kpop?mp=/s"] }
+ ]},
+ { name:"Hong Kong", country:"Hong Kong", region:"Asia-Pacific", lat:22.3193, lon:114.1694, freq:"92.6", stations:[
+   { name:"Hong Kong Community Radio", genre:"Modern", hls:true, urls:["https://stream.hkcr.live/audio/stream.m3u8"] },
+   { name:"RTHK Radio 1", genre:"World", urls:["http://stm1.rthk.hk/radio1"] }
+ ]},
+ { name:"Singapore", country:"Singapore", region:"Asia-Pacific", lat:1.3521, lon:103.8198, freq:"93.3", stations:[
+   { name:"YES 933", genre:"Pop", urls:["https://22893.live.streamtheworld.com/YES933_SC?dist=radiosingapore"] }
+ ]},
+ { name:"Delhi", country:"India", region:"Asia-Pacific", lat:28.6139, lon:77.209, freq:"106.4", stations:[
+   { name:"AIR FM Gold", genre:"World", hls:true, urls:["https://airhlspush.pc.cdn.bitgravity.com/httppush/hlspbaudio005/hlspbaudio00564kbps.m3u8"] },
+   { name:"AIR Raagam", genre:"Classical", hls:true, urls:["https://airhlspush.pc.cdn.bitgravity.com/httppush/hlspbaudioragam/hlspbaudioragam_Auto.m3u8"] }
+ ]},
+ { name:"Manila", country:"Philippines", region:"Asia-Pacific", lat:14.5995, lon:120.9842, freq:"89.9", stations:[
+   { name:"Magic 89.9", genre:"Pop", urls:["https://stream.zeno.fm/hcbrvvfd938uv"] }
+ ]},
+ { name:"Kuala Lumpur", country:"Malaysia", region:"Asia-Pacific", lat:3.139, lon:101.6869, freq:"98.8", stations:[
+   { name:"988 FM", genre:"Pop", urls:["https://28103.live.streamtheworld.com/988_FMAAC.aac"] }
+ ]},
+ { name:"Osaka", country:"Japan", region:"Asia-Pacific", lat:34.6937, lon:135.5023, freq:"85.1", stations:[
+   { name:"NFRS Sound Up Station", genre:"Modern", urls:["https://stream2.rcast.net/70945"] }
+ ]},
+ { name:"Taipei", country:"Taiwan", region:"Asia-Pacific", lat:25.033, lon:121.5654, freq:"93.1", stations:[
+   { name:"Taipei Radio", genre:"World", hls:true, urls:["https://stream.ginnet.cloud/live0130lo-yfyo/_definst_/fm/playlist.m3u8"] }
+ ]},
+ { name:"Bangkok", country:"Thailand", region:"Asia-Pacific", lat:13.7563, lon:100.5018, freq:"98.5", stations:[
+   { name:"Bangkok Community Radio", genre:"Dance", urls:["https://bcr.radiocult.fm/stream"] }
+ ]},
+ { name:"Hanoi", country:"Vietnam", region:"Asia-Pacific", lat:21.0278, lon:105.8342, freq:"91.0", stations:[
+   { name:"VOV1", genre:"World", hls:true, urls:["https://str.vov.gov.vn/vovlive/vov1vov5Vietnamese.sdp_aac/playlist.m3u8"] }
+ ]},
+ { name:"Athens", country:"Greece", region:"Europe", lat:37.9838, lon:23.7275, freq:"92.0", stations:[
+   { name:"Galaxy 92", genre:"Dance", urls:["http://netradio.live24.gr/galaxy9292"] },
+   { name:"Off Radio", genre:"Modern", urls:["http://s3.yesstreaming.net:7062/stream"] }
+ ]},
+ { name:"Barcelona", country:"Spain", region:"Europe", lat:41.3874, lon:2.1686, freq:"89.1", stations:[
+   { name:"Cadena SER Barcelona", genre:"Talk", urls:["https://playerservices.streamtheworld.com/api/livestream-redirect/SER_BARCELONA.mp3"] },
+   { name:"scannerFM", genre:"Modern", urls:["https://eu10.fastcast4u.com/scannerfm"] }
+ ]},
+ { name:"Oslo", country:"Norway", region:"Europe", lat:59.9139, lon:10.7522, freq:"99.3", stations:[
+   { name:"Radio Nova", genre:"Modern", urls:["http://stream.radionova.no/mp3"] },
+   { name:"NRK P1 Stor-Oslo", genre:"World", urls:["https://cdn0-47115-liveicecast0.dna.contentdelivery.net/p1_mp3_h"] }
+ ]},
+ { name:"Helsinki", country:"Finland", region:"Europe", lat:60.1699, lon:24.9384, freq:"101.4", stations:[
+   { name:"Radio Helsinki", genre:"Modern", urls:["https://stream.radiohelsinki.fi/stream"] },
+   { name:"Groove FM", genre:"Soul", hls:true, urls:["https://aud-stream-groove.nm-elemental.nelonenmedia.fi/playlist.m3u8"] }
+ ]},
+ { name:"Reykjavik", country:"Iceland", region:"Europe", lat:64.1466, lon:-21.9426, freq:"98.9", stations:[
+   { name:"Bylgjan 98.9", genre:"Pop", urls:["http://icecast.365net.is:8000/orbbylgjan.aac"] },
+   { name:"RÚV Rás 2", genre:"Modern", urls:["http://netradio.ruv.is/ras2.mp3"] }
+ ]},
+ { name:"Belgrade", country:"Serbia", region:"Europe", lat:44.8176, lon:20.4633, freq:"90.9", stations:[
+   { name:"TDI Radio", genre:"Dance", urls:["http://streaming.tdiradio.com:8000/tdiradio"] },
+   { name:"RTS Beograd 202", genre:"Modern", hls:true, urls:["https://rtsradio-live.morescreens.com/RTS_2_004/audio/chunklist.m3u8"] }
+ ]},
+ { name:"Bucharest", country:"Romania", region:"Europe", lat:44.4268, lon:26.1025, freq:"98.3", stations:[
+   { name:"Black Rhino Radio", genre:"Modern", urls:["https://blackrhinoradio.out.airtime.pro/blackrhinoradio_a"] },
+   { name:"Radio România Cultural", genre:"Classical", urls:["http://stream2.srr.ro:8016/stream"] }
+ ]},
+ { name:"Glasgow", country:"United Kingdom", region:"UK", lat:55.8642, lon:-4.2518, freq:"87.7", stations:[
+   { name:"Subcity Radio", genre:"Modern", urls:["https://stream.subcity.org/listen"] },
+   { name:"Clyde Built Radio", genre:"Modern", urls:["https://clydebuiltradio.out.airtime.pro/clydebuiltradio_a"] }
+ ]},
+ { name:"Naples", country:"Italy", region:"Europe", lat:40.8518, lon:14.2681, freq:"101.5", stations:[
+   { name:"Radio Kiss Kiss Napoli", genre:"Pop", urls:["http://ice07.fluidstream.net/KKNapoli.mp3"] },
+   { name:"Radio Marte", genre:"Pop", urls:["https://stream1.xdevel.com/audio0s975753-313/stream/icecast.audio"] }
+ ]},
+ { name:"Porto", country:"Portugal", region:"Europe", lat:41.1579, lon:-8.6291, freq:"98.9", stations:[
+   { name:"Rádio Nova Era", genre:"Dance", urls:["http://centova.radio.com.pt:9478/stream"] },
+   { name:"Rádio Nova 98.9", genre:"Pop", urls:["http://centova.radio.com.pt:9528/stream"] }
+ ]},
+ { name:"Chicago", country:"United States", region:"North America", lat:41.8781, lon:-87.6298, freq:"90.9", stations:[
+   { name:"WDCB 90.9", genre:"Blues", urls:["http://wdcb-ice.streamguys.org/wdcb128"] }
+ ]},
+ { name:"Montreal", country:"Canada", region:"North America", lat:45.5017, lon:-73.5673, freq:"89.3", stations:[
+   { name:"CISM 89.3", genre:"Modern", urls:["http://stream03.ustream.ca/cism128.mp3"] }
+ ]},
+ { name:"Vancouver", country:"Canada", region:"North America", lat:49.2827, lon:-123.1207, freq:"101.9", stations:[
+   { name:"CiTR 101.9", genre:"Modern", urls:["https://live.citr.ca/live.aac"] }
+ ]},
+ { name:"Honolulu", country:"United States", region:"North America", lat:21.3099, lon:-157.8581, freq:"90.1", stations:[
+   { name:"KTUH 90.1", genre:"Modern", urls:["https://stream.ktuh.org:8001/stream"] }
+ ]},
+ { name:"Nashville", country:"United States", region:"North America", lat:36.1627, lon:-86.7816, freq:"97.5", stations:[
+   { name:"WSM 650", genre:"Country", urls:["http://stream01048.westreamradio.com/wsm-am-mp3"] },
+   { name:"WXNA 101.5", genre:"Modern", urls:["http://listen.wxnafm.org:8000/stream"] }
+ ]},
+ { name:"Knoxville", country:"United States", region:"North America", lat:35.9606, lon:-83.9207, freq:"89.9", stations:[
+   { name:"WDVX 89.9", genre:"Americana", urls:["https://wdvx.streamguys1.com/live"] }
+ ]},
+ { name:"Kent", country:"United States", region:"North America", lat:41.1537, lon:-81.3579, freq:"89.7", stations:[
+   { name:"Folk Alley", genre:"Folk", urls:["https://freshgrass.streamguys1.com/folkalley-128mp3"] }
+ ]},
+ { name:"Charlotte", country:"United States", region:"North America", lat:35.2271, lon:-80.8431, freq:"100.9", stations:[
+   { name:"WPZS Praise 100.9", genre:"Gospel", urls:["https://playerservices.streamtheworld.com/api/livestream-redirect/WPZSFM.mp3"] }
+ ]},
+ { name:"Philadelphia", country:"United States", region:"North America", lat:39.9526, lon:-75.1652, freq:"96.5", stations:[
+   { name:"WNAP Gospel Highway 11", genre:"Gospel", urls:["https://ice23.securenetsystems.net/WNAP"] }
+ ]},
+ { name:"Medellín", country:"Colombia", region:"Latin America & Caribbean", lat:6.2442, lon:-75.5812, freq:"100.9", stations:[
+   { name:"Latina Stereo", genre:"Salsa", urls:["https://stream.latinastereo.com/proxy/latina/stream"] }
+ ]},
+ { name:"Lima", country:"Peru", region:"Latin America & Caribbean", lat:-12.0464, lon:-77.0428, freq:"101.1", stations:[
+   { name:"Radio Panamericana", genre:"Salsa", urls:["https://mdstrm.com/audio/6598b62dded1380470f4e539/icecast.audio"] }
+ ]},
+ { name:"Montevideo", country:"Uruguay", region:"Latin America & Caribbean", lat:-34.9011, lon:-56.1645, freq:"97.1", stations:[
+   { name:"Babel FM 97.1", genre:"Jazz", urls:["https://radios.iwstreaming.uy/8030/stream"] },
+   { name:"Radio Uruguay", genre:"World", urls:["https://radios.iwstreaming.uy/8036/stream"] }
+ ]},
+ { name:"Quito", country:"Ecuador", region:"Latin America & Caribbean", lat:-0.1807, lon:-78.4678, freq:"106.5", stations:[
+   { name:"Radio Quito 760", genre:"World", urls:["https://streamingecuador.net:8332/radioquito"] },
+   { name:"Radio Canela Pichincha", genre:"Cumbia", urls:["https://canelaradio.makrodigital.com/stream/canelaradioquito"] }
+ ]},
+ { name:"Port of Spain", country:"Trinidad and Tobago", region:"Latin America & Caribbean", lat:10.6596, lon:-61.5086, freq:"101.1", stations:[
+   { name:"Scorch Radio 101.1", genre:"Soca", urls:["https://stream.velalabs.co/scorch"] },
+   { name:"Smash Radio TT", genre:"Dancehall", urls:["https://nginx.smashradiott.com/radio.mp3"] }
+ ]},
+ { name:"Panama City", country:"Panama", region:"Latin America & Caribbean", lat:8.9824, lon:-79.5199, freq:"100.5", stations:[
+   { name:"Fabulosa Estéreo 100.5", genre:"Salsa", urls:["https://www.streaming507.net:8130/stream"] },
+   { name:"Omega Stereo", genre:"Classic Rock", urls:["https://www.streaming507.net:8048/stream"] }
+ ]},
+ { name:"Online", country:"United States · Web", region:"North America", lat:39.8, lon:-98.6, freq:"98.7", stations:[
+   { name:"StreamingSoundtracks", genre:"Film Scores", urls:["http://hi5.streamingsoundtracks.com/"] },
+   { name:"Ambient Sleeping Pill", genre:"Ambient", urls:["https://radio.stereoscenic.com/asp-h"] }
+ ]}
+);
+addStation("Paris", { name:"La Grosse Radio Métal", genre:"Metal", urls:["http://hd.lagrosseradio.info/lagrosseradio-metal-192.mp3"] });
+addStation("Paris", { name:"King Dub Radio", genre:"Dub", urls:["http://london-dedicated.myautodj.com:8862/stream"] });
+addStation("Los Angeles", { name:"KNAC Pure Rock", genre:"Metal", urls:["https://free.rcast.net/71987"] });
+addStation("Los Angeles", { name:"KXLU 88.9", genre:"Punk", urls:["http://kxlu.streamguys1.com/kxlu-hi"] });
+addStation("London", { name:"Mi-Soul Radio", genre:"Soul", urls:["https://listen-misoul.sharp-stream.com/462_mi_soul_128_mp3"] });
+addStation("London", { name:"Radio Caroline", genre:"Classic Rock", urls:["http://sc6.radiocaroline.net:8040/;stream.mp3"] });
+addStation("Dublin", { name:"Ceol FM", genre:"Folk", urls:["http://ceol.fm:8000/live"] });
+addStation("Toronto", { name:"Rainwave Game", genre:"Game Music", urls:["https://relay.rainwave.cc/game.mp3"] });
+addStation("Accra", { name:"Asaase Radio 99.5", genre:"Afrobeat", urls:["http://stream.radiojar.com/cyg76xcvp0hvv"] });
+addStation("Mumbai", { name:"Bollywood Gaane Purane", genre:"World", urls:["https://stream.zeno.fm/6n6ewddtad0uv"] });
+addStation("Munich", { name:"Rock Antenne Punk Rock", genre:"Punk", urls:["http://s8-webradio.rockantenne.de/punkrock.aac"] });
+CITIES.forEach(c => c.stations.forEach(s => { s.city = c.name; if (!s.key) s.key = c.name + "|" + s.name; }));
+ALL_STATIONS.push(...CITIES.flatMap(c => c.stations.filter(s => !ALL_STATIONS.includes(s))));
+
 /* ---------------- globe ---------------- */
 const stage = document.getElementById('stage');
 const canvas = document.getElementById('globe');
@@ -522,7 +781,7 @@ CITIES.forEach((c, i) => {
   const t = document.createElement('button');
   t.className = 'tick'; t.type = 'button';
   t.style.left = (4 + (92 * i) / (CITIES.length - 1)) + '%';
-  t.innerHTML = '<b>' + c.freq + '</b>' + c.name.split(' ')[0].toUpperCase();
+  t.innerHTML = '<b>' + c.freq + '</b><span class="tn">' + c.name.split(' ')[0].toUpperCase() + '</span>';
   t.addEventListener('click', () => selectCity(i, true));
   ticksEl.appendChild(t);
 });
@@ -569,9 +828,9 @@ function tick(){
     if (Math.abs(d) < 0.4 && Math.abs(targetTilt - tilt) < 0.4){ rot = targetRot; tilt = targetTilt; targetRot = null; }
   } else if (!dragging){
     if (Math.abs(vel) > 0.005){ rot += vel; vel *= 0.94; }
-    else if (now - lastInteract > 4000 && view === 'home') rot += 0.025;
+    else if (now - lastInteract > 4000 && tab === 'globe' && view !== 'city') rot += 0.025;
   }
-  if (!document.hidden) drawGlobe();
+  if (!document.hidden && tab === 'globe') drawGlobe();
   requestAnimationFrame(tick);
 }
 stage.addEventListener('pointerdown', e => {
@@ -612,17 +871,38 @@ document.addEventListener('gesturestart', e => e.preventDefault());
 "use strict";
 /* ---------------- views ---------------- */
 const homeView = document.getElementById('homeView');
-const cityView = document.getElementById('cityView');
 const searchView = document.getElementById('searchView');
 const panel = document.getElementById('panel');
-let view = 'home', currentCity = -1, genreFilter = 'All';
+const globeTab = document.getElementById('globeTab');
+const sheet = document.getElementById('sheet');
+const tabGlobeBtn = document.getElementById('tabGlobeBtn');
+const tabListBtn = document.getElementById('tabListBtn');
+let view = 'home', tab = 'globe', currentCity = -1, genreFilter = 'All';
+function setTab(t){
+  tab = t;
+  globeTab.style.display = t === 'globe' ? 'flex' : 'none';
+  panel.style.display = t === 'list' ? 'block' : 'none';
+  tabGlobeBtn.classList.toggle('on', t === 'globe');
+  tabListBtn.classList.toggle('on', t === 'list');
+  if (t === 'globe') fitCanvas();
+}
 function show(v){
   view = v;
-  homeView.hidden = v !== 'home';
-  cityView.hidden = v !== 'city';
-  searchView.hidden = v !== 'search';
+  if (v === 'city'){ sheet.hidden = false; setTab('globe'); }
+  else {
+    sheet.hidden = true;
+    homeView.hidden = v !== 'home';
+    searchView.hidden = v !== 'search';
+    setTab('list');
+  }
   panel.scrollTop = 0;
 }
+tabGlobeBtn.addEventListener('click', () => setTab('globe'));
+tabListBtn.addEventListener('click', () => {
+  if (view === 'city'){ view = 'home'; homeView.hidden = false; searchView.hidden = true; }
+  sheet.hidden = true;
+  setTab('list');
+});
 let favs = [];
 try { favs = JSON.parse(localStorage.getItem('wf_favs_v1') || '[]'); } catch(e){ favs = []; }
 function isFav(st){ return favs.some(f => f.key === st.key); }
@@ -682,14 +962,36 @@ function renderHome(){
     CITIES.forEach((c, i) => {
       if (c.region !== region) return;
       const b = document.createElement('button');
-      b.className = 'cityCard glass'; b.type = 'button';
-      b.innerHTML = '<span><span class="nm">' + c.name + '</span><span class="ct"><br>' + c.country + ' · ' + c.stations.length + (c.stations.length > 1 ? ' stations' : ' station') + '</span></span><span class="fq">' + c.freq + '<small>FM · WF</small></span>';
-      b.addEventListener('click', () => selectCity(i, true));
+      b.className = 'cityCard glass'; b.type = 'button'; b.id = 'cityCard' + i;
+      b.innerHTML = '<span><span class="nm">' + c.name + '</span><span class="ct"><br>' + c.country + ' · ' + c.stations.length + (c.stations.length > 1 ? ' stations' : ' station') + '</span></span><span class="fq">' + c.freq + '<small>FM · WF</small></span><span class="car">' + (openCity === i ? '▾' : '▸') + '</span>';
+      b.addEventListener('click', () => {
+        openCity = openCity === i ? -1 : i; openGenre = 'All';
+        renderHome();
+        if (openCity === i){ const el = document.getElementById('cityCard' + i); if (el) el.scrollIntoView({ block:'nearest' }); }
+      });
       list.appendChild(b);
+      if (openCity === i){
+        const sub = document.createElement('div'); sub.className = 'stSub';
+        const genres = ['All', ...new Set(c.stations.map(s => s.genre))];
+        if (genres.length > 2){
+          const row = document.createElement('div'); row.className = 'subchips';
+          genres.forEach(g => {
+            const ch = document.createElement('button');
+            ch.className = 'chip' + (openGenre === g ? ' on' : ''); ch.type = 'button'; ch.textContent = g;
+            ch.addEventListener('click', () => { openGenre = g; renderHome(); });
+            row.appendChild(ch);
+          });
+          sub.appendChild(row);
+        }
+        c.stations.filter(s => openGenre === 'All' || s.genre === openGenre)
+          .forEach(s => sub.appendChild(stationRow(s)));
+        list.appendChild(sub);
+      }
     });
   });
   renderFavs();
 }
+let openCity = -1, openGenre = 'All';
 function renderFavs(){
   const fb = document.getElementById('favBlock');
   fb.innerHTML = '';
@@ -729,10 +1031,8 @@ function selectCity(i, rotateTo){
     targetTilt = Math.max(-45, Math.min(55, CITIES[i].lat));
   }
 }
-document.getElementById('backBtn').addEventListener('click', () => { show('home'); renderHome(); });
-document.getElementById('backBtn2').addEventListener('click', () => {
-  if (currentCity >= 0){ show('city'); renderCity(); } else { show('home'); renderHome(); }
-});
+document.getElementById('backBtn').addEventListener('click', () => { sheet.hidden = true; view = 'home'; });
+document.getElementById('backBtn2').addEventListener('click', () => { show('home'); renderHome(); });
 document.getElementById('luckyBtn').addEventListener('click', () => {
   const st = ALL_STATIONS[(Math.random() * ALL_STATIONS.length) | 0];
   const ci = CITIES.findIndex(c => c.name === st.city);
@@ -971,10 +1271,12 @@ searchInput.addEventListener('input', () => {
 });
 
 /* ---------------- go ---------------- */
+setTab('globe');
 fitCanvas();
 renderHome();
 requestAnimationFrame(tick);
 </script>
+<script data-goatcounter="https://georgestriderbuilds.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- pages retrigger: dance expansion -->
 </body>
 </html>
